@@ -63,11 +63,11 @@
                 <span>Welcome,</span>
                 <h2>
                 @if(Auth::guard('admin')->check())
-                {{ Auth::guard('admin')->user()->username }}
+                {{ Auth::guard('admin')->user()->nama }}
                 @elseif(Auth::guard('resepsionist')->check())
-                {{ Auth::guard('resepsionist')->user()->username }}
+                {{ Auth::guard('resepsionist')->user()->nama }}
                 @elseif(Auth::guard('dokter')->check())
-                {{ Auth::guard('dokter')->user()->username }}
+                {{ Auth::guard('dokter')->user()->nama }}
                 @elseif(Auth::guard('apoteker')->check())
                 {{ Auth::guard('apoteker')->user()->username }}
                 @endif
@@ -157,7 +157,7 @@
 <!-- footer content -->
 <footer>
 <div class="pull-right">
-Developed with <i class="fa fa-heart" style="color: red"></i> by <a href="http://easytech.co.id/">Easytech.co.id</a>
+Developed with <i class="fa fa-heart" style="color: red"></i> by <a href="https://bangadam.github.io">NoSleepTeam</a>
 </div>
 <div class="clearfix"></div>
 </footer>
@@ -214,7 +214,10 @@ buttons: [
 $('#datatable').DataTable();
 $('.datepicker').datepicker({
 format: 'yyyy-mm-dd',
-todayHighlight: true
+todayHighlight: true,
+changeYear: true,
+changeMonth: true,
+showMonthAfterYear: true,
 });
 $('.bulan').datepicker( {
 format: "mm",

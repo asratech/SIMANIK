@@ -17,21 +17,22 @@ class DokterController extends Controller
     }
 
     public function index(Pasien $pasien) {
-            $antri = $pasien->whereDate('created_at', date('Y-m-d'))->where(['status' => 'antri', 'layanan_dokter' => Session::get('id')])->orderBy('created_at', 'desc')->get();
-            // dd($antri);
+            $antri = $pasien->whereDate('created_at', date('Y-m-d'))->where(['status' => 'antri', 'layanan_dokter' => Session::get('id')])->get();
             $obat = $pasien->whereDate('created_at', date('Y-m-d'))->where(['status' => 'obat', 'layanan_dokter' => Session::get('id')])->orderBy('updated_at')->get();
             $pasien = $pasien->where('layanan_dokter', Session::get('id'))->whereDate('created_at', date('Y-m-d'))->get();
+
     	return view('dokter.index', ['antri'=> $antri, 'obat' => $obat, 'pasien' => $pasien]);
     }
 
-    public function getRekamMedisPasien($id, $nama, $tgl) {
-        $pasien = Pasien::find($id);
-        $rekamMedis =  RK_Medis::where(['nama' => $nama, 'tgl_lahir' => $tgl])->get()->toArray();
+    public function getRekamMedisPasien($pasien_id, $nama, $tgl_lahir) {
+        $dokter_id = $this->getDokterId();
+        $pasien = Pasien::find($pasien_id);
+        $rekamMedis =  RK_Medis::where(['pasien_id' => $pasien_id, 'dokter_id' => $dokter_id])->get()->toArray();
         $umur = new \DateTime($pasien->tgl_lahir);
         $ubah = new \DateTime();
         $umur = $ubah->diff($umur);
         // dd($nama);
-        // 
+        //
         $obat = Obat::get()->toArray();
         $id = RK_Medis::select('id')->get()->last();
             if ($id == null) {
@@ -42,15 +43,15 @@ class DokterController extends Controller
         $id += 1;
         $id  = "RK" . str_pad($id, 4, "0", STR_PAD_LEFT);
         // dd($id);
-        return view('dokter.pasien-rekam-medis', ['pasien' => $pasien, 'rekamMedis' => $rekamMedis, 'obat' => $obat, 'id' => $id, 'nama' => $nama, 'tgl_lahir' => $tgl, 'umur' => $umur]);
+        return view('dokter.pasien-rekam-medis', ['pasien' => $pasien, 'rekamMedis' => $rekamMedis, 'obat' => $obat, 'id' => $id, 'nama' => $nama, 'tgl_lahir' => $tgl_lahir, 'umur' => $umur]);
     }
 
     public function postRekamMedisPasien(Request $request) {
         if ($request->ajax()) {
             $rekamMedis = RK_Medis::create([
                 'id' => $request->id,
-                'nama' => $request->nama,
-                'tgl_lahir' => $request->tgl,
+                // 'nama' => $request->nama,
+                // 'tgl_lahir' => $request->tgl,
                 'bb' => $request->bb,
                 'tb' => $request->tb,
                 'tensi' => $request->tensi,
@@ -66,18 +67,19 @@ class DokterController extends Controller
             ]);
 
             $pasien = Pasien::find($request->pasien_id)->update(['status' => 'obat']);
-            
-            for ($i=0; $i <count($request['obat']) ; $i++) { 
+
+            for ($i=0; $i <count($request['obat']) ; $i++) {
                 $resep = Resep::create([
                     'dokter_id'    => $request['dokter_id'],
                     'pasien_id'    =>   $request['pasien_id'],
                     'obat_id'        =>     $request['obat'][$i]['value'],
                     'keterangan'  =>    $request['keterangan'][$i]['value'],
                     'jumlah'          =>    $request['jumlah'][$i]['value'],
+                    'biaya_dokter' => $request->biaya_dokter,
                     'status'          =>     'belum'
                     ]);
             }
-            
+
             return response()->json($rekamMedis);
         }
     }
@@ -212,5 +214,10 @@ class DokterController extends Controller
             $data = Resep::with('obat')->where(['dokter_id' => Session::get('id'), 'pasien_id' => $request->pasien_id])->get();
             return response()->json($data);
         }
+    }
+
+    public function getDokterId() {
+        $dokter_id = Session::get('id');
+        return $dokter_id;
     }
 }

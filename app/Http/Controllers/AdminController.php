@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Resepsionist;
-use App\Dokter;
-use File;
-use App\Speasialis;
 use App\Apoteker;
+use App\Dokter;
+use App\Resepsionist;
+use App\Speasialis;
+use File;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Image;
 
 class AdminController extends Controller
@@ -97,7 +98,7 @@ class AdminController extends Controller
 
                 }
                 $data->password = bcrypt($request->password);
-                // $data->save();
+                $data->save();
                 return redirect()->back();
             }elseif($request->password == $data->password) {
                 $data->id = $request->id;
@@ -122,7 +123,6 @@ class AdminController extends Controller
                 }
                 $data->save();
                 return redirect()->back();
-
             }
 
     }
@@ -283,7 +283,6 @@ class AdminController extends Controller
     }
 
     public function updateAdminApoteker(Request $request, Apoteker $apoteker) {
-        // dd($request->all());
             $data = $apoteker->find($request->id);
             if ($request->password != $data->password) {
                 $data->username = $request->username;
@@ -313,6 +312,7 @@ class AdminController extends Controller
                 $data->nama = $request->nama;
                 $data->alamat = $request->alamat;
                 $data->tgl_lahir = $request->tgl_lahir;
+                $data->photo = $request->photo;
                 if($request->hasFile('photo')) {
                     $file = $request->file('photo');
                     $fileName   =   date('Y-m-d') . "." . $file->getClientOriginalName();

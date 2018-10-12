@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Resep;
+use App\KategoriObat;
 use App\Obat;
 use App\Pasien;
-use App\KategoriObat;
+use App\Resep;
+use App\TransaksiPasien;
+use Illuminate\Http\Request;
 use PDF, Excel;
 
 class ApotekerController extends Controller
@@ -30,8 +31,7 @@ class ApotekerController extends Controller
             // dd($resep);
             $nama_dokter = Resep::with('dokter')->first();
             $nama_pasien = Resep::with('pasien')->first();
-            // dd($resep);
-            return view('apoteker.getDataResep', ['ada' => $ada, 'habis' => $habis, 'nama_dokter' => $nama_dokter, 'nama_pasien' => $nama_pasien]);
+            return view('apoteker.getDataResep', ['ada' => $ada, 'habis' => $habis, 'nama_dokter' => $nama_dokter, 'nama_pasien' => $nama_pasien, "dokter_id" => $dokter_id, "pasien_id" => $pasien_id]);
     }
 
     public function getDetailResep(Request $request) {
@@ -142,12 +142,21 @@ class ApotekerController extends Controller
     public function postResep(Request $request) {
         if ($request->ajax()) {
             $pasien = Pasien::find($request->pasien_id)->update(['status' => 'selesai']);
-            for ($i=0; $i <count($request['id']) ; $i++) { 
+            for ($i=0; $i <count($request['id']) ; $i++) {
                 $data = Resep::where('id', $request['id'][$i]['value'])->first();
                 $data->status = 'selesai';
                 $data->save();
             }
-            return response()->json($data);
+            // create transaksi pasien
+            $transaksi_pasien = TransaksiPasien::create([
+                'dokter_id' => $data['dokter_id'],
+                'pasien_id' => $request['pasien_id'],
+                'bayar' => $request['bayar'],
+                'kembalian' => $request['kembalian'],
+                'total' => $request['total'],
+                'tgl_resep' => $request['tgl_resep']
+            ]);
+            return response()->json($transaksi_pasien);
         }
     }
 
@@ -155,7 +164,7 @@ class ApotekerController extends Controller
     public function PrintDetailResep(Request $request, $dokter_id, $pasien_id) {
         // dd($request['habis']);
         $pasien = Pasien::find($pasien_id)->update(['status' => 'selesai']);
-         for ($i=0; $i <count($request['habis']) ; $i++) { 
+         for ($i=0; $i <count($request['habis']) ; $i++) {
             $data = Resep::where('id', $request['habis'][$i])->first();
             $data->status = 'selesai';
             $data->save();
@@ -164,8 +173,16 @@ class ApotekerController extends Controller
         $habis = 'habis';
        $resep = Resep::with(['obat', 'dokter', 'pasien'])->whereHas('obat', function($q) use($habis){ $q->where('status', '=', $habis); })->where(['dokter_id' => $dokter_id, 'pasien_id' => $pasien_id])->get()->toArray();
        $size = array(0,0,393,590);
-        $pdf = PDF::loadView('apoteker.printDetailResep', ['resep' => $resep])->setPaper($size)->setOptions(['dpi' => 72,'defaultFont' => 'sans-serif']); 
+        $pdf = PDF::loadView('apoteker.printDetailResep', ['resep' => $resep])->setPaper($size)->setOptions(['dpi' => 72,'defaultFont' => 'sans-serif']);
        return $pdf->stream('resep-dokter.pdf');
+    }
+
+    public function getPrintTagihan($tagihan_id, $dokter_id, $pasien_id) {
+        $size = array(0,0,204,650);
+        $resep = Resep::with(['obat', 'dokter', 'pasien'])->where(['dokter_id' => $dokter_id, 'pasien_id' => $pasien_id])->get()->toArray();
+        $tagihan = TransaksiPasien::where('id', $tagihan_id)->first();
+        $pdf = PDF::loadView('apoteker.print', ['resep' => $resep, 'tagihan' => $tagihan])->setOptions(['dpi' => 72,'defaultFont' => 'sans-serif']);
+        return $pdf->stream('Tagihan Klinik.pdf');
     }
 
 

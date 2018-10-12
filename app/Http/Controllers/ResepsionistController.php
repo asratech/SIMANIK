@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Pasien;
 use App\Dokter;
+use App\NoAntrian;
+use App\Pasien;
+use Barryvdh\DomPDF\PDF;
 use Excel;
-use PDF;
+use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ResepsionistController extends Controller
 {
@@ -16,9 +19,9 @@ class ResepsionistController extends Controller
 
     public function index() {
             $pasien = Pasien::whereDate('created_at', '=', date('Y-m-d'))->where('status', '=', 'antri')->get();
-            $total = Pasien::get()->toArray();
-            $bulan = Pasien::whereMonth('created_at', '=', date('m'))->whereYear('created_at', '=', date('Y'))->get()->toArray();
-            $dokter = Dokter::with('spesialis')->get()->toArray();        
+            $total = Pasien::where('status', 'selesai')->get()->toArray();
+            $bulan = Pasien::where('status', 'selesai')->whereMonth('created_at', '=', date('m'))->whereYear('created_at', '=', date('Y'))->get()->toArray();
+            $dokter = Dokter::with('spesialis')->get()->toArray();
             $id = Pasien::select('id')->get()->last();
             if ($id == null) {
                 $id = 1;
@@ -28,27 +31,54 @@ class ResepsionistController extends Controller
             $id += 1;
             $id  = "PS" . str_pad($id, 4, "0", STR_PAD_LEFT);
     	return view('resepsionist.index', [
-                                'pasien' => $pasien, 
-                                'id' => $id, 
-                                'total' => $total,
-                                'bulan' => $bulan,
-                                'dokter' => $dokter
-                                ]);
+            'pasien' => $pasien,
+            'id' => $id,
+            'total' => $total,
+            'bulan' => $bulan,
+            'dokter' => $dokter
+        ]);
     }
 
     public function getPasien() {
-             $HariIni = Pasien::whereDate('created_at', '=', date('Y-m-d'))->where('status', '=', 'antri')->get();
-            $bulan = Pasien::whereMonth('created_at', '=', date('m'))->whereYear('created_at', '=', date('Y'))->get()->toArray();
+        $HariIni = Pasien::whereDate('created_at', '=', date('Y-m-d'))->where('status', '=', 'antri')->get();
+        $bulan = Pasien::whereMonth('created_at', '=', date('m'))->whereYear('created_at', '=', date('Y'))->get()->toArray();
         $pasien = Pasien::orderBy('created_at', 'desc')->groupBy('nama')->get()->toArray();
         $dokter = Dokter::with('spesialis')->get()->toArray();
-        // dd($dokter); 
+        // dd($dokter);
     	return view('resepsionist.pasien.index', ['pasien'=> $pasien, 'bulan' => $bulan, 'HariIni' => $HariIni, 'dokter' => $dokter]);
     }
 
     public function postPendaftaranPasien(Request $request) {
-            // dd($request->all());
-            $data = Pasien::create($request->all());
-            return redirect()->back();
+            try {
+                DB::beginTransaction();
+
+                $data = Pasien::create($request->all());
+
+                $no_antrian = $this->getLastNoAntrian();
+
+                $pasien = Pasien::whereDate('created_at', '=', date('Y-m-d'))->where('status', '=', 'antri')->get();
+                $total = Pasien::where('status', 'selesai')->get()->toArray();
+                $bulan = Pasien::whereMonth('created_at', '=', date('m'))->whereYear('created_at', '=', date('Y'))->get()->toArray();
+
+                DB::commit();
+                return response()->json([
+                    "success" => [
+                        "data" => $data,
+                        "id" => $no_antrian,
+                        "pasien_hari_ini" => count($pasien),
+                        "total_pasien" => count($total),
+                        "total_per_bulan" => count($bulan)
+                    ],
+                    "errors" => null
+                ], 200);
+            } catch (\Exception $e) {
+                DB::rollback();
+                $errors = $e->errorInfo[2];
+                return response()->json([
+                    "success" => null,
+                    "errors" => $errors
+                ], 400);
+            }
     }
 
     public function postPasienTerdaftar(Request $request) {
@@ -133,5 +163,59 @@ class ResepsionistController extends Controller
         return view('resepsionist.pasien.pdf', ['bulan' => $bulan, 'tahun' => $tahun, 'pasien' => $pasien]);
     }
 
-    
+    public function no_antrian() {
+        $id = NoAntrian::select('id')->get()->last();
+        $id=$id['id'];
+        if ($id == null) {
+            $id = 1;
+        } else {
+            $id = (int) $id;
+            $id += 1;
+        }
+        $id  = str_pad($id, 3, "0", STR_PAD_LEFT);
+        $data = NoAntrian::create(["no" => $id]);
+
+        return view('resepsionist.no_antrian.index', ['data' => $data['no']]);
+        // $no = NoAntrian::select('id')->get()->last();
+        // if ($no == null) {
+        //     $no = 1;
+        // }
+        // $no  = substr($no['no'], 3);
+        // $no = (int) $no;
+        // $no += 1;
+        // $no  = str_pad($no, 3, "0", STR_PAD_LEFT);
+        // $no_antrian = NoAntrian::create([
+        //     'no' => $no
+        // ]);
+
+        // $pdf = PDF::loadView('no_antrian.pdf', [
+        //     'no' => $no
+        // ])->setPaper($size)->setOptions(['dpi' => 72,'defaultFont' => 'sans-serif']);
+
+        // return $pdf->stream('No.' . $no . '.pdf');
+    }
+
+    public function getLastNoAntrian() {
+        $id = Pasien::select('id')->get()->last();
+            if ($id == null) {
+                $id = 1;
+            }
+            $id  = substr($id['id'], 4);
+            $id = (int) $id;
+            $id += 1;
+            $id  = "PS" . str_pad($id, 4, "0", STR_PAD_LEFT);
+
+        return $id;
+    }
+
+    public function resetNoAntrian() {
+        try {
+            NoAntrian::query()->truncate();
+            $data = ["success" => "berhasil mereset no antrian.", "error" => null];
+        } catch (Exception $e) {
+            $data = ["success" => null, "errors" => "gagal mereset no antrian."];
+        }
+        $data["last_id"] = $this->getLastNoAntrian();
+        return response()->json($data);
+    }
 }

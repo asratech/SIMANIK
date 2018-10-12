@@ -9,7 +9,7 @@ class CreateRKMedisTable extends Migration
     /**
      * Run the migrations.
      *
-     * @return void 
+     * @return void
      */
     public function up()
     {
@@ -19,6 +19,7 @@ class CreateRKMedisTable extends Migration
             $table->char('pasien_id', 10);
             $table->char('dokter_id', 10);
             $table->string('diagnosa');
+            $table->string('tindakan');
             $table->string('keluhan');
             $table->text('anamnesis');
             $table->text('keterangan');
@@ -27,7 +28,7 @@ class CreateRKMedisTable extends Migration
             $table->float('tb');
             $table->float('tensi');
             $table->enum('bw', ['ya', 'tidak']);
-            $table->timestamps();      
+            $table->timestamps();
       });
     }
 

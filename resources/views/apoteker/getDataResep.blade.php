@@ -15,8 +15,50 @@
 <div class="x_content">
 	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 		<a href="{{route('apoteker.index')}}" class="btn btn-danger btn-flat btn-md"><i class="fa fa-arrow-left"></i> Kembali</a>
+		@if ($ada)
+			<button class="btn btn-primary btn-flat btn-md btn-konfirmasi pull-right">Konfirmasi pembayaran <i class="fa fa-credit-card"></i></button>
+		@endif
 	</div>
-	<div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+		<div style="margin-top: 5px;text-align: center;">
+			<h4>Deskripsi Pembayaran</h4>
+		</div>
+		<hr>
+		<table class="table table-striped table-bordered">
+			<tbody>
+				<tr>
+					<th>Jumlah Bayar</th>
+					<td>
+						<input id="bayar" type="number" name="bayar" min="0" value="0" class="form-control">
+					</td>
+				</tr>
+				<tr>
+					<th>Jumlah Obat</th>
+					<td id="total-jumlah-ada"></td>
+				</tr>
+				<tr>
+					<th>Biaya Dokter</th>
+					<td>Rp. {{$ada[0]['biaya_dokter']}}</td>
+					<input type="hidden" value="{{$ada[0]['biaya_dokter']}}" id="biaya_dokter">
+				</tr>
+				<tr>
+					<th>Biaya Obat</th>
+					<td id="total-harga-ada"></td>
+				</tr>
+				<tr>
+					<th>Total Keseluruhan</th>
+					<td id="total-keseluruhan"></td>
+				</tr>
+				<tr>
+					<th>Uang Kembalian</th>
+					<td id="kembalian"></td>
+				</tr>
+			</tbody>
+		</table>
+		<div style="text-align: center;">
+			<h4>Daftar Obat</h4>
+		</div>
+		<hr>
 		<table  class="table table-striped table-bordered">
 			<thead>
 				<tr>
@@ -28,8 +70,8 @@
 				</tr>
 			</thead>
 			@if ($ada)
-				
-			<tfoot>
+
+			{{-- <tfoot>
 			<tr>
 				<td>&nbsp;</td>
 				<td>Total</td>
@@ -37,10 +79,9 @@
 				<td id="total-jumlah-ada"></td>
 				<td>&nbsp;</td>
 			</tr>
-			</tfoot>
+			</tfoot> --}}
 			<tbody>
 				<?php $no = 1;?>
-
 				@foreach ($ada as $data)
 				<tr class="baris">
 					<td>{{$no++}}</td>
@@ -53,17 +94,17 @@
 				</tr>
 				@endforeach
 			</tbody>
-			@else 
+			@else
 			<tbody>
 				<tr>
 					<td colspan="5" style="text-align: center;">Tidak ada obat tersedia</td>
 				</tr>
 			</tbody>
 			@endif
-			
+
 		</table>
 	</div>
-	<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 		<table id="habis" class="table table-striped table-bordered">
 			<thead>
 				<tr>
@@ -74,6 +115,11 @@
 			</thead>
 			<tbody>
 				<?php $no = 1;?>
+				@if($habis == null)
+					<tr class="baris">
+						<td colspan="3" style="text-align: center;">Tidak ada obat yang tidak tersedia</td>
+					</tr>
+				@endif
 				@foreach ($habis as $data)
 				<tr class="baris">
 					<td>{{$no++}}</td>
@@ -87,12 +133,7 @@
 		</table>
 	</div>
 	<div class="row">
-		<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-		@if ($ada)
-			<button  class="btn btn-primary btn-flat btn-md btn-konfirmasi">Konfirmasi pembayaran <i class="fa fa-credit-card"></i></button>
-		@endif
-		</div>
-		<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+		<div class="col-xs-12 ">
 			@if($habis)
 		<form action="{{url('/apoteker/DetailResep/dokter_id='.$data['dokter_id']. '&pasien_id='.$data['pasien_id'].'/Print')}}" method="post" target="_blank">
 		{{csrf_field()}}
@@ -114,21 +155,58 @@
 		var sum = 0;
 		var quantity = 0;
 		$('.harga-ada').each(function() {
-		var price = $(this);
-		var q = price.closest('tr').find('.jumlah-ada').text();
-		sum += parseInt(price.text()) * parseInt(q);
-		quantity += parseInt(q);
+			var price = $(this);
+			var q = price.closest('tr').find('.jumlah-ada').text();
+			sum += parseInt(price.text()) * parseInt(q);
+			quantity += parseInt(q);
 		});
 		$('#total-harga-ada').text('Rp. '+sum);
 		$('#total-jumlah-ada').text(quantity+ ' Obat');
+
+		// pembayaran
+		var biaya_dokter = $('#biaya_dokter').val();
+		var total_sementara = parseFloat(sum) + parseFloat(biaya_dokter);
+		$('#total-keseluruhan').text('Rp. '+total_sementara)
+		var kembalian;
+		$('#bayar').on('keyup', function() {
+			var bayar = $(this).val();
+			kembalian = bayar-total_sementara;
+
+			$('#kembalian').text('Rp. '+kembalian)
+		});
+
+		// Process it
 		$('.btn-konfirmasi').on('click', function(e) {
 			e.preventDefault();
-			var id = $('input[name="id[]"').serializeArray();
-			var pasien_id = $('input[name="pasien_id"').val();
-			$.post("{{route('postResep')}}", {id:id,pasien_id:pasien_id}, function(data) {
-				toastr.success('Success !', 'Pembayaran sudah dikonfirmasi !');
+			let id = $('input[name="id[]"').serializeArray();
+			let pasien_id = $('input[name="pasien_id"]').val();
+			let dokter_id = '{{$dokter_id}}';
+			let tgl_resep = '{{$ada[0]['created_at']}}';
+			bayar = $('#bayar').val();
+			let data = {
+				id:id,
+				pasien_id:pasien_id,
+				total: total_sementara,
+				bayar: bayar,
+				tgl_resep: tgl_resep,
+				kembalian: kembalian
+			};
+			$.ajax({
+			    url: '{{route('postResep')}}',
+			    data: data,
+			    method:'POST',
+			    dataType: 'json',
+				async:false
+		  	}).done(function(data) {
+		  		toastr.success('Success !', 'Pembayaran sudah dikonfirmasi !');
 				$('.btn-konfirmasi').prop('disabled', true);
-			});
+				newTabs(data.id)
+		  	});
+
+			function newTabs(tagihan_id) {
+				window.open("/apoteker/print-tagihan/tagihan="+tagihan_id+"&dokter_id="+dokter_id+"&pasien_id="+pasien_id, "_newtab")
+			}
+
 		});
 	});
 </script>

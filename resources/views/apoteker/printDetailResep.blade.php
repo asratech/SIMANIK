@@ -6,7 +6,7 @@
   <title>Cetak Resep Dokter</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-  <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
+  {{-- <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet"> --}}
   <style type="text/css">
     body {
             background: #fff;
@@ -28,7 +28,7 @@
 	    text-align: left;
 	    padding: 8px;
 	}
-	
+
 	tr:nth-child(even){background-color: #f2f2f2}
         ul li {
         	list-style: none;
@@ -42,7 +42,7 @@
         #footer {
         	text-align: center;
         	margin-top: 5px;
-        	font-family: 'Pacifico', cursive;
+        	/*font-family: 'Pacifico', cursive;*/
         }
   </style>
 <body>

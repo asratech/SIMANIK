@@ -123,7 +123,7 @@
 						<td>{{ date('d-F-Y', strtotime($data['tgl_lahir'])) }}</td>
 						<td>
 							<a href="#modal-edit" data-toggle="modal" class="btn btn-warning btn-flat btn-edit"
-							data-id={{ $data['id'] }} data-username={{ $data['username'] }} data-nama="{{ $data['nama'] }}" data-alamat={{ $data['alamat'] }} data-tgl_lahir={{ $data['tgl_lahir'] }} data-password="{{$data['password']}}"
+							data-id='{{ $data['id'] }}' data-username='{{ $data['username'] }}' data-nama="{{ $data['nama'] }}" data-alamat={{ $data['alamat'] }} data-tgl_lahir='{{ $data['tgl_lahir'] }}' data-password="{{$data['password']}}"
 							><i class="fa fa-edit"></i></a>
 							<a href="#!" class="btn btn-danger btn-flat btn-delete" data-id="{{$data['id']}}"><i class="fa fa-trash"></i></a>
 						</td>

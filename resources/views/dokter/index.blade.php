@@ -63,7 +63,7 @@
       <div class="">
         <ul class="to_do">
           @foreach ($pasien as $data)
-            <li><p>{{$data['nama']}} 
+            <li><p>{{$data['nama']}}
             @if ($data['status'] == 'antri')
               <span class="pull-right btn btn-xs btn-danger">Mengantri <i class="fa fa-spinner fa-pulse fa-fw"></i></span>
               @elseif($data['status'] == 'obat')

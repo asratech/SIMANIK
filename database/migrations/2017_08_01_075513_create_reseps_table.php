@@ -19,7 +19,9 @@ class CreateResepsTable extends Migration
             $table->smallInteger('obat_id');
             $table->char('pasien_id', 10);
             $table->string('keterangan', 255);
+            $table->enum('status', ['selesai', 'belum']);
             $table->smallInteger('jumlah');
+            $table->double("biaya_dokter")->nullable();
             $table->timestamps();
         });
     }

@@ -41,10 +41,10 @@
           <div class="modal-body">
             <form action="{{ route('login') }}" method="post">
               {{ csrf_field() }}
-              <div style="text-align: center">
+              {{-- <div style="text-align: center">
                 <h5><strong>Demo</strong></h5>
                 <p>Username: resepsionist | Password: resepsionist</p>
-              </div>
+              </div> --}}
               <div class="form-group">
                 <label>Username</label>
                 <input type="text" name="username" id="" class="form-control">
@@ -74,10 +74,10 @@
           <div class="modal-body">
             <form action="{{ route('login') }}" method="post">
               {{ csrf_field() }}
-              <div style="text-align: center">
+              {{-- <div style="text-align: center">
                 <h5><strong>Demo</strong></h5>
                 <p>Username: dokter | Password: dokter</p>
-              </div>
+              </div> --}}
               <div class="form-group">
                 <label>Username</label>
                 <input type="text" name="username" id="" class="form-control">
@@ -107,10 +107,10 @@
           <div class="modal-body">
             <form action="{{ route('login') }}" method="post">
               {{ csrf_field() }}
-              <div style="text-align: center">
+              {{-- <div style="text-align: center">
                 <h5><strong>Demo</strong></h5>
                 <p>Username: apoteker | Password: apoteker</p>
-              </div>
+              </div> --}}
               <div class="form-group">
                 <label>Username</label>
                 <input type="text" name="username" id="" class="form-control">
@@ -140,10 +140,10 @@
           <div class="modal-body">
             <form action="{{ route('login') }}" method="post">
               {{ csrf_field() }}
-              <div style="text-align: center">
+              {{-- <div style="text-align: center">
                 <h5><strong>Demo</strong></h5>
                 <p>Username: admin | Password: admin</p>
-              </div>
+              </div> --}}
               <div class="form-group">
                 <label>Username</label>
                 <input type="text" name="username" id="" class="form-control">
@@ -166,6 +166,6 @@
 
     <script src="{{ URL::to('vendors/jquery/dist/jquery.min.js') }}"></script>
     <script src="{{ URL::to('vendors/bootstrap/dist/js/bootstrap.min.js') }}"></script>
-    
+
   </body>
 </html>

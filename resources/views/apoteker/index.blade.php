@@ -44,14 +44,14 @@
         data-dokter_id="{{$data['dokter_id']}}" data-pasien_id="{{$data['pasien_id']}}"
         data-controls-modal="modal-detail-selesai"
    data-backdrop="static"
-   data-keyboard="false">Lihat</a> <span class="pull-right" style="margin-right: 3px">{{$data->updated_at->diffForHumans()}} | </span></p></li>  
+   data-keyboard="false">Lihat</a> <span class="pull-right" style="margin-right: 3px">{{$data->updated_at->diffForHumans()}} | </span></p></li>
         @endforeach
         </ul>
       </div>
       </div>
     </div>
   </div>
-</div>   
+</div>
 
 <div class="modal fade" id="modal-detail-selesai">
   <div class="modal-dialog modal-lg">
@@ -99,7 +99,7 @@
 
               var table = '<tr><td>'+data[0][k].obat.nama+'</td><td class="jumlah">'+data[0][k].jumlah+'</td><td class="harga">'+data[0][k].obat.harga+'</td><td>'+(data[0][k].obat.status == 'ada' ? '<span class="btn btn-flat btn-success btn-block">Tersedia <i class="fa fa-check"></i></span>' : '<span class="btn btn-flat btn-danger btn-block">Habis <i class="fa fa-close"></i></span>' )+'</td></tr>';
               $('#daftar-obat').append(table);
-            });             
+            });
           });
           });
           $('.btn-close').on('click', function() {

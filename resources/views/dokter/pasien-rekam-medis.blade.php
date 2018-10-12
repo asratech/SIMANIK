@@ -14,7 +14,7 @@
 						<input type="text" name="id" id="id" class="form-control" readonly="" value="{{ $pasien['id'] }}">
 					</div>
 				</div>
-				<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">	
+				<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
 					<div class="form-group">
 						<label>Nama Pasien</label>
 						<input type="text" name="nama" id="nama" class="form-control" readonly="" value="{{ $pasien['nama'] }}">
@@ -176,22 +176,26 @@
 					<div class="clearfix"></div>
 				</div>
 				<div class="x_content">
-					<label>Alergi Obat</label>
-					<div class="form-group">
-						<div style="float: left;display: block">
-							<div class="radio">
-								<label>
-									<input type="radio" name="alergi" id="ya" value="ya">
-									Ya
-								</label>
-								<label>
-									<input type="radio" name="alergi" id="tidak" value="tidak" checked="checked">
-									Tidak
-								</label>
+					<label>Biaya Dokter (Optional)</label>
+					<input type="number" name="biaya_dokter" id="biaya_dokter" class="form-control" min='0' value="0">
+					<div>
+						<label>Alergi Obat</label>
+						<div class="form-group">
+							<div style="float: left;display: block">
+								<div class="radio">
+									<label>
+										<input type="radio" name="alergi" id="ya" value="ya">
+										Ya
+									</label>
+									<label>
+										<input type="radio" name="alergi" id="tidak" value="tidak" checked="checked">
+										Tidak
+									</label>
+								</div>
 							</div>
-						</div>
-						<div style="float: left;margin-left: 10px">
-							<input type="text" name="alergi_obat" id="alergi_obat" class="form-control" disabled="">
+							<div style="float: left;margin-left: 10px">
+								<input type="text" name="alergi_obat" id="alergi_obat" class="form-control" disabled="">
+							</div>
 						</div>
 					</div>
 					<br><br>
@@ -276,11 +280,12 @@
 						$('.select2').select2();
 					}
 					});
-					
+
 				});
 				$('#frm-rekam-medis').on('submit', function(e) {
 					e.preventDefault();
 					var id = $('#rk_medis').val();
+					var biaya_dokter = $('#biaya_dokter').val();
 					var nama = $('#nama').val();
 					var tgl = $('#tgl_lahir').val();
 					var dokter_id = $('#dokter_id').val();
@@ -304,6 +309,7 @@
 					var keterangan = $('input[name="keterangan[]"]').serializeArray();
 					$.post("{{route('postRekamMedisPasien')}}", {
 						id:id,
+						biaya_dokter:biaya_dokter,
 						nama:nama,
 						tgl:tgl,
 						dokter_id:dokter_id,
@@ -322,7 +328,7 @@
 						jumlah:jumlah,
 						keterangan:keterangan,
 					}, function(data) {
-						console.log(data);
+						// console.log(data);
 						toastr.success('Success !', 'Data berhasil di simpan !');
 						location.href = "{{route('dokter.index')}}";
 					});
