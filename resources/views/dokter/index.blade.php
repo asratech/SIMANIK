@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <div class="row">
-  <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+  <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
     <div class="x_panel" style="height: 500px !important">
       <div class="x_title">
         <h2>Daftar Antrian Pasien</h2>
@@ -17,7 +17,7 @@
         <ul class="to_do">
         <?php $no = 1; ?>
         @foreach($antri as $data)
-          <li><p>{{ $no++ }}. {{ $data['nama'] }} <small>({{ $data->created_at->diffForHumans() }})</small><a href="{{url("/dokter/periksa/pasien/id=" . $data['id'] . "&nama=" .$data['nama']."&tgl=".$data['tgl_lahir'])}}" class="btn btn-success btn-xs pull-right">Periksa</a></p></li>
+          <li><p>{{ $no++ }}. {{ $data['nama'] }} <span class="label label-success"> ({{$data['no_antrian']['no']}})</span><a href="{{url("/dokter/periksa/pasien/id=" . $data['id'] . "&nama=" .$data['nama']."&tgl=".$data['tgl_lahir'])}}" class="btn btn-success btn-xs pull-right">Periksa</a></p></li>
         @endforeach
         </ul>
         </div>
@@ -25,7 +25,7 @@
     </div>
   </div>
 
-  <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+  <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
     <div class="x_panel" style="height: 500px !important">
       <div class="x_title">
         <h2>Pasien Sudah Diperiksa</h2>
@@ -48,7 +48,7 @@
     </div>
   </div>
 
-  <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+  <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
     <div class="x_panel" style="height: 500px !important">
       <div class="x_title">
         <h2>Daftar Pasien Hari Ini</h2>

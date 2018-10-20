@@ -15,6 +15,7 @@ class CreateNoAntriansTable extends Migration
     {
         Schema::create('no_antrians', function (Blueprint $table) {
             $table->increments('id');
+            $table->char('pasien_id');
             $table->char('no');
             $table->timestamps();
         });

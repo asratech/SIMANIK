@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('content')
-<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+<div class="container">
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 	<div class="x_panel">
 		<div class="x_title">
 			<h2>Isi Resep | <span class="btn btn-primary btn-flat" style="color:white">Dr. {{$nama_dokter['dokter']['nama']}}</span> | <span class="btn btn-info btn-flat" style="color:white">Pasien: {{$nama_pasien['pasien']['nama']}}</span></h2>
@@ -38,8 +39,8 @@
 				</tr>
 				<tr>
 					<th>Biaya Dokter</th>
-					<td>Rp. {{$ada[0]['biaya_dokter']}}</td>
-					<input type="hidden" value="{{$ada[0]['biaya_dokter']}}" id="biaya_dokter">
+					<td>Rp. {{($ada ? $ada[0]['biaya_dokter'] : $habis[0]['biaya_dokter'])}}</td>
+					<input type="hidden" value="{{($ada ? $ada[0]['biaya_dokter'] : $habis[0]['biaya_dokter'])}}" id="biaya_dokter">
 				</tr>
 				<tr>
 					<th>Biaya Obat</th>
@@ -59,6 +60,7 @@
 			<h4>Daftar Obat</h4>
 		</div>
 		<hr>
+		<div class="table-responsive">
 		<table  class="table table-striped table-bordered">
 			<thead>
 				<tr>
@@ -70,16 +72,6 @@
 				</tr>
 			</thead>
 			@if ($ada)
-
-			{{-- <tfoot>
-			<tr>
-				<td>&nbsp;</td>
-				<td>Total</td>
-				<td id="total-harga-ada"></td>
-				<td id="total-jumlah-ada"></td>
-				<td>&nbsp;</td>
-			</tr>
-			</tfoot> --}}
 			<tbody>
 				<?php $no = 1;?>
 				@foreach ($ada as $data)
@@ -103,6 +95,7 @@
 			@endif
 
 		</table>
+		</div>
 	</div>
 	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 		<table id="habis" class="table table-striped table-bordered">
@@ -148,6 +141,7 @@
 </div>
 </div>
 </div>
+</div>
 @endsection
 @section('customJs')
 <script type="text/javascript">
@@ -181,7 +175,8 @@
 			let id = $('input[name="id[]"').serializeArray();
 			let pasien_id = $('input[name="pasien_id"]').val();
 			let dokter_id = '{{$dokter_id}}';
-			let tgl_resep = '{{$ada[0]['created_at']}}';
+			let tgl_resep = '{{($ada ? $ada[0]['created_at'] : $habis[0]['created_at'])}}';
+			let biaya_dokter = $('#biaya_dokter').val();
 			bayar = $('#bayar').val();
 			let data = {
 				id:id,
@@ -189,7 +184,8 @@
 				total: total_sementara,
 				bayar: bayar,
 				tgl_resep: tgl_resep,
-				kembalian: kembalian
+				kembalian: kembalian,
+				biaya_dokter: biaya_dokter
 			};
 			$.ajax({
 			    url: '{{route('postResep')}}',

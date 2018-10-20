@@ -9,14 +9,15 @@ class Resep extends Model
     protected $table = 'reseps';
     protected $primaryKey = 'id';
     // public $incrementing = false;
-    
+
     protected $fillable = [
     	'dokter_id',
     	'pasien_id',
-	'obat_id',
-	'keterangan',
-             'jumlah',
-	'status',
+    	'obat_id',
+    	'keterangan',
+        'jumlah',
+        'biaya_dokter',
+    	'status',
     ];
 
     public function dokter() {

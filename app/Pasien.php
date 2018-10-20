@@ -20,4 +20,8 @@ class Pasien extends Model
         'status',
         'layanan_dokter'
     ];
+
+    public function no_antrian() {
+        return $this->belongsTo('App\NoAntrian', 'id', 'pasien_id');
+    }
 }

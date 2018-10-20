@@ -28,7 +28,6 @@ class ApotekerController extends Controller
             $habis = 'habis';
             $ada = Resep::with(['obat', 'dokter', 'pasien'])->whereHas('obat', function($q) use($ada){ $q->where('status', '=', $ada); })->where(['dokter_id' => $dokter_id, 'pasien_id' => $pasien_id])->get()->toArray();
             $habis =  Resep::with(['obat', 'dokter', 'pasien'])->whereHas('obat', function($q) use($habis){ $q->where('status', '=', $habis); })->where(['dokter_id' => $dokter_id, 'pasien_id' => $pasien_id])->get()->toArray();
-            // dd($resep);
             $nama_dokter = Resep::with('dokter')->first();
             $nama_pasien = Resep::with('pasien')->first();
             return view('apoteker.getDataResep', ['ada' => $ada, 'habis' => $habis, 'nama_dokter' => $nama_dokter, 'nama_pasien' => $nama_pasien, "dokter_id" => $dokter_id, "pasien_id" => $pasien_id]);

@@ -88,7 +88,7 @@
             <select name="layanan_dokter" id="pelayanan_dokter" class="form-control select2" style="width:100% !important">
               <option disabled selected>-Pilih Dokter-</option>
               @foreach($dokter as $data)
-                <option value="{{$data['id']}}" data-spesialis="{{$data['spesialis']['spesialis']}}">{{$data['nama']}}</option>
+                <option value="{{$data['id']}}" data-spesialis="{{$data['spesialis']['spesialis']}}">{{$data['nama']}} ({{$data['spesialis']['spesialis']}})</option>
               @endforeach
             </select>
           </div>
@@ -135,7 +135,7 @@
           @if(count($pasien) >= 0)
             @foreach($pasien as $key => $data)
               <li>
-                <p>{{++$key}}. {{ $data->nama }} ({{ $data->created_at->diffForHumans() }})<a href="#!" class="btn btn-danger btn-xs pull-right btn-hapus"
+                <p>{{ $data->nama }} <span class="label label-success ">({{$data['no_antrian']['no']}})</span><a href="#!" class="btn btn-danger btn-xs pull-right btn-hapus"
                     data-toggle="tooltip" title="Hapus Data" data-id="{{ $data['id'] }}"><i class="fa fa-trash"></i></a></p>
               </li>
             @endforeach
@@ -157,33 +157,51 @@
       let data = $(this).serialize();
       let div = "";
       let no = {{count($pasien)}}
-      $.post("{{ route('postPendaftaranPasien') }}", data)
-      .done(function(data) {
-        $("#frm-pasien")[0].reset()
-        div = "<li><p>."+data.success.data.nama+"<a href='#!' class='btn btn-danger btn-xs pull-right btn-hapus' data-toggle='tooltip' title='Hapus Data' data-id="+data.success.data.id+"><i class='fa fa-trash'></i></a></p></li>";
-        $("#daftar-antri").append(div);
-        $("#nomor").empty();
-        $("#nomor").text(no+1)
-        $("#id_antri").val(data.success.id)
-        $("#totalPasien").text(data.success.pasien_hari_ini)
-        $("#pasienBulanIni").text(data.success.total_pasien)
-        $("#pasienHariIni").text(data.success.total_per_bulan)
-        toastr.success('Success !', 'Data berhasil di simpan !');
 
-      }).fail(function(xhr, status, error) {
-        toastr.error('Error !', xhr.responseJSON.errors);
-      })
-      window.open("{{route('resepsionist.no_antrian')}}", "_newtab")
+      $.ajax({
+          url: '{{ route('postPendaftaranPasien') }}',
+          data: data,
+          method:'POST',
+          dataType: 'json',
+          async:false
+        }).done(function(data) {
+           $("#frm-pasien")[0].reset()
+            div = "<li><p>"+data.success.data.nama+"&nbsp;<span class='label label-success'>("+data.success.no_antrian+")</span> <a href='#!' class='btn btn-danger btn-xs pull-right btn-hapus' data-toggle='tooltip' title='Hapus Data' data-id="+data.success.data.id+"><i class='fa fa-trash'></i></a></p></li>";
+            $("#daftar-antri").append(div);
+            $("#nomor").empty();
+            $("#nomor").text(no+1)
+            $("#id_antri").val(data.success.id)
+            $("#totalPasien").text(data.success.pasien_hari_ini)
+            $("#pasienBulanIni").text(data.success.total_pasien)
+            $("#pasienHariIni").text(data.success.total_per_bulan)
+            toastr.success('Success !', 'Data berhasil di simpan !');
+            window.open("/resepsionist/no-antrian-pasien/pasien_id="+data.success.data.id, "_newtab")
+        }).fail(function(xhr, status, error) {
+          toastr.error('Error !', xhr.responseJSON.errors);
+        })
     });
 
     $("#reset-no-antrian").on('click', function() {
-      $.get("{{route('resepsionist.reset_no_antrian')}}", null, function(data) {
-        if (data.success != null) {
-          toastr.success('Success !', data.success);
-        } else {
-          toastr.error('Success !', data.errors);
+      $.confirm({
+        icon: 'fa fa-warning',
+        title: 'Alert !',
+        content: 'Apakah anda ingin mereset No. Antrian ?',
+        type: 'red',
+        typeAnimated: true,
+        buttons: {
+          confirm: function () {
+            $.get("{{route('resepsionist.reset_no_antrian')}}", null, function(data) {
+              if (data.success != null) {
+                toastr.success('Success !', data.success);
+              } else {
+                toastr.error('Success !', data.errors);
+              }
+            })
+          },
+          cancel: function () {},
         }
-      })
+      });
+
     })
 
     $('#pelayanan_dokter').on('change', function () {

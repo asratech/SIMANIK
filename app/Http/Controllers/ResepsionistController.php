@@ -18,7 +18,7 @@ class ResepsionistController extends Controller
     }
 
     public function index() {
-            $pasien = Pasien::whereDate('created_at', '=', date('Y-m-d'))->where('status', '=', 'antri')->get();
+            $pasien = Pasien::with('no_antrian')->whereDate('created_at', '=', date('Y-m-d'))->where('status', '=', 'antri')->get();
             $total = Pasien::where('status', 'selesai')->get()->toArray();
             $bulan = Pasien::where('status', 'selesai')->whereMonth('created_at', '=', date('m'))->whereYear('created_at', '=', date('Y'))->get()->toArray();
             $dokter = Dokter::with('spesialis')->get()->toArray();
@@ -44,7 +44,6 @@ class ResepsionistController extends Controller
         $bulan = Pasien::whereMonth('created_at', '=', date('m'))->whereYear('created_at', '=', date('Y'))->get()->toArray();
         $pasien = Pasien::orderBy('created_at', 'desc')->groupBy('nama')->get()->toArray();
         $dokter = Dokter::with('spesialis')->get()->toArray();
-        // dd($dokter);
     	return view('resepsionist.pasien.index', ['pasien'=> $pasien, 'bulan' => $bulan, 'HariIni' => $HariIni, 'dokter' => $dokter]);
     }
 
@@ -54,17 +53,31 @@ class ResepsionistController extends Controller
 
                 $data = Pasien::create($request->all());
 
-                $no_antrian = $this->getLastNoAntrian();
+                $pasien_id = $this->getLastNoAntrian();
 
                 $pasien = Pasien::whereDate('created_at', '=', date('Y-m-d'))->where('status', '=', 'antri')->get();
                 $total = Pasien::where('status', 'selesai')->get()->toArray();
                 $bulan = Pasien::whereMonth('created_at', '=', date('m'))->whereYear('created_at', '=', date('Y'))->get()->toArray();
 
+                // create no antrian
+                $id = NoAntrian::select('id')->get()->last();
+                $id=$id['id'];
+                if ($id == null) {
+                    $id = 1;
+                } else {
+                    $id = (int) $id;
+                    $id += 1;
+                }
+                $id  = str_pad($id, 3, "0", STR_PAD_LEFT);
+                $antrian = NoAntrian::create(["no" => $id, 'pasien_id' => $data['id']]);
+
                 DB::commit();
                 return response()->json([
                     "success" => [
                         "data" => $data,
-                        "id" => $no_antrian,
+                        "id" => $pasien_id,
+                        "id_antrian" => $antrian->id,
+                        "no_antrian" => $antrian->no,
                         "pasien_hari_ini" => count($pasien),
                         "total_pasien" => count($total),
                         "total_per_bulan" => count($bulan)
@@ -103,6 +116,18 @@ class ResepsionistController extends Controller
                 'status' => 'antri',
                 'layanan_dokter' => $request->dokter_id
             ]);
+
+            // create no antrian
+            $id = NoAntrian::select('id')->get()->last();
+            $id= $id['id'];
+            if ($id == null) {
+                $id = 1;
+            } else {
+                $id = (int) $id;
+                $id += 1;
+            }
+            $id  = str_pad($id, 3, "0", STR_PAD_LEFT);
+            $antrian = NoAntrian::create(["no" => $id, 'pasien_id' => $create_pasien['id']]);
             return response()->json($create_pasien);
         }
     }
@@ -163,19 +188,9 @@ class ResepsionistController extends Controller
         return view('resepsionist.pasien.pdf', ['bulan' => $bulan, 'tahun' => $tahun, 'pasien' => $pasien]);
     }
 
-    public function no_antrian() {
-        $id = NoAntrian::select('id')->get()->last();
-        $id=$id['id'];
-        if ($id == null) {
-            $id = 1;
-        } else {
-            $id = (int) $id;
-            $id += 1;
-        }
-        $id  = str_pad($id, 3, "0", STR_PAD_LEFT);
-        $data = NoAntrian::create(["no" => $id]);
-
-        return view('resepsionist.no_antrian.index', ['data' => $data['no']]);
+    public function no_antrian($pasien_id) {
+        $no_antrian = NoAntrian::where('pasien_id', $pasien_id)->first()->no;
+        return view('resepsionist.no_antrian.index', ['data' => $no_antrian]);
         // $no = NoAntrian::select('id')->get()->last();
         // if ($no == null) {
         //     $no = 1;

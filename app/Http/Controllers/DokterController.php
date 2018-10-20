@@ -17,7 +17,7 @@ class DokterController extends Controller
     }
 
     public function index(Pasien $pasien) {
-            $antri = $pasien->whereDate('created_at', date('Y-m-d'))->where(['status' => 'antri', 'layanan_dokter' => Session::get('id')])->get();
+            $antri = $pasien->with('no_antrian')->whereDate('created_at', date('Y-m-d'))->where(['status' => 'antri', 'layanan_dokter' => Session::get('id')])->get();
             $obat = $pasien->whereDate('created_at', date('Y-m-d'))->where(['status' => 'obat', 'layanan_dokter' => Session::get('id')])->orderBy('updated_at')->get();
             $pasien = $pasien->where('layanan_dokter', Session::get('id'))->whereDate('created_at', date('Y-m-d'))->get();
 
@@ -27,12 +27,11 @@ class DokterController extends Controller
     public function getRekamMedisPasien($pasien_id, $nama, $tgl_lahir) {
         $dokter_id = $this->getDokterId();
         $pasien = Pasien::find($pasien_id);
-        $rekamMedis =  RK_Medis::where(['pasien_id' => $pasien_id, 'dokter_id' => $dokter_id])->get()->toArray();
+        $rekamMedis =  RK_Medis::where(['nama' => $nama, 'dokter_id' => $dokter_id, 'tgl_lahir' => $tgl_lahir])->get()->toArray();
+        // dd($rekamMedis);
         $umur = new \DateTime($pasien->tgl_lahir);
         $ubah = new \DateTime();
         $umur = $ubah->diff($umur);
-        // dd($nama);
-        //
         $obat = Obat::get()->toArray();
         $id = RK_Medis::select('id')->get()->last();
             if ($id == null) {
@@ -50,8 +49,7 @@ class DokterController extends Controller
         if ($request->ajax()) {
             $rekamMedis = RK_Medis::create([
                 'id' => $request->id,
-                // 'nama' => $request->nama,
-                // 'tgl_lahir' => $request->tgl,
+                'nama' => $request->nama,
                 'bb' => $request->bb,
                 'tb' => $request->tb,
                 'tensi' => $request->tensi,
@@ -75,9 +73,9 @@ class DokterController extends Controller
                     'obat_id'        =>     $request['obat'][$i]['value'],
                     'keterangan'  =>    $request['keterangan'][$i]['value'],
                     'jumlah'          =>    $request['jumlah'][$i]['value'],
-                    'biaya_dokter' => $request->biaya_dokter,
+                    'biaya_dokter' => $request['biaya_dokter'],
                     'status'          =>     'belum'
-                    ]);
+                ]);
             }
 
             return response()->json($rekamMedis);

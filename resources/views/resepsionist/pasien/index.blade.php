@@ -69,7 +69,7 @@
 			</form>
 		</div>
 	</div>
-	
+
 	<div class="x_panel">
 		<div class="x_title">
 			<h2>Data Pasien Terdaftar</h2>
@@ -182,7 +182,7 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h4 class="modal-title">Edit Data</h4>
+				<h4 class="modal-title">Tambah Data</h4>
 			</div>
 			<div class="modal-body">
 				<form method="post" id="frm-tambah">
@@ -203,7 +203,7 @@
 							<select name="dokter_id" id="dokter_id" class="form-control select2" style="width:100% !important">
 								<option disabled selected>-Pilih Dokter-</option>
 								@foreach($dokter as $data)
-									<option value="{{$data['id']}}" data-id="{{$data['id']}}" data-nama="{{$data['nama']}}" data-spesialis="{{$data['spesialis']['spesialis']}}">{{$data['nama']}}</option>
+									<option value="{{$data['id']}}" data-id="{{$data['id']}}" data-nama="{{$data['nama']}}" data-spesialis="{{$data['spesialis']['spesialis']}}">{{$data['nama']}} ({{$data['spesialis']['spesialis']}})</option>
 								@endforeach
 							</select>
 						</div>
@@ -214,7 +214,7 @@
 							<input type="text" id="spesialis_id" class="form-control" readonly>
 						</div>
 					</div>
-					
+
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default btn-close" data-dismiss="modal">Close</button>
@@ -274,12 +274,12 @@
 	                            });
 	                        },
 	                        cancel: function () {
-	                    
+
 	                        },
 	                    }
 	                });
 	          });
-		
+
 		$('#datatable').on('click','.btn-tambah', function(e) {
 			e.preventDefault();
 			var id = $(this).data('id');
@@ -300,10 +300,21 @@
 		$('#frm-tambah').on('submit', function(e) {
 			e.preventDefault();
 			var data = $(this).serialize();
-			$.post("{{route('postPasienTerdaftar')}}", data, function(data) {
-				toastr.success('Success !', 'Pasien berhasil terdaftar di antrian !');
+			 $.ajax({
+	          url: '{{ route('postPasienTerdaftar') }}',
+	          data: data,
+	          method:'POST',
+	          dataType: 'json',
+	          async:false
+	        }).done(function(data) {
+	        	toastr.success('Success !', 'Pasien berhasil terdaftar di antrian !');
+				window.open("/resepsionist/no-antrian-pasien/pasien_id="+data.id, "_newtab")
 				$('#modal-tambah').modal('hide');
-			});
+				location.href = "{{route('resepsionist.index')}}"
+	        }).fail(function() {
+	        	toastr.error('Error !', 'Gagal menambah pasien');
+	        	$('#modal-tambah').modal('hide');
+	        })
 		});
 	});
 </script>

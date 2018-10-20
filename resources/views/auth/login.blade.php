@@ -20,15 +20,13 @@
     <link href="{{ URL::to('css/custom.min.css') }}" rel="stylesheet">
   </head>
   <body style="background: #2A3F54;font-family: 'Roboto Condensed';"  id="fakeLoader">
-    <div style="text-align: center;margin-top: 100px">
-      <div class="col-lg-12">
-        <h1 style="text-align: center;margin-bottom: 30px;color:#ffffff">Sistem Informasi Klinik</h1>
-        @include('layouts.alert')
-        <a data-toggle="modal" href='#modal-resepsionist'><img src="{{URL::to('images/resepsionis.png')}}"></a>
-        <a data-toggle="modal" href='#modal-dokter'><img src="{{URL::to('images/dokter.png')}}"></a>
-        <a data-toggle="modal" href='#modal-apoteker'><img src="{{URL::to('images/apoteker.png')}}"></a>
-        <a data-toggle="modal" href='#modal-admin'><img src="{{URL::to('images/admin.png')}}"></a>
-      </div>
+    <div class="container" style="text-align: center;margin-top: 100px">
+          <h1 style="text-align: center;margin-bottom: 30px;color:#ffffff">Sistem Informasi Klinik</h1>
+          @include('layouts.alert')
+          <a data-toggle="modal" href='#modal-resepsionist'><img src="{{URL::to('images/resepsionis.png')}}"></a>
+          <a data-toggle="modal" href='#modal-dokter'><img src="{{URL::to('images/dokter.png')}}"></a>
+          <a data-toggle="modal" href='#modal-apoteker'><img src="{{URL::to('images/apoteker.png')}}"></a>
+          <a data-toggle="modal" href='#modal-admin'><img src="{{URL::to('images/admin.png')}}"></a>
     </div>
     {{-- Modal resepsionist --}}
     <div class="modal fade" id="modal-resepsionist">

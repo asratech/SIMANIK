@@ -31,55 +31,53 @@
 				</div>
 			</div>
 		</div>
-
 		{{-- modal riwayat rekam medis --}}
-					<div class="modal fade" id="modal-riwayat">
-						<div class="modal-dialog modal-lg">
-							<div class="modal-content">
-								<div class="modal-header">
-									<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-									<h4 class="modal-title">Riwayat Rekam Medis</h4>
-								</div>
-								<div class="modal-body">
-									<table class="table table-striped table-bordered">
-										<tr>
-											<thead>
-												<tr>
-													<th width="15%">Tanggal Periksa</th>
-													<th>Hasil Rekam Medis</th>
-												</tr>
-											</thead>
-											<tbody>
-												@if($rekamMedis)
-												@foreach($rekamMedis as $data)
-												<tr>
-													<td>{{ date('d-m-Y', strtotime($data['created_at'])) }}</td>
-													<td>
-														Keluhan: <strong>{{$data['keluhan']}} </strong>|
-														Anamnesis: <strong>{{$data['anamnesis']}} </strong>|
-														Diagnosa: <strong>{{$data['diagnosa']}} </strong>|
-														Tindakan: <strong>{{$data['tindakan']}} </strong>|
-														Keterangan: <strong>{{$data['keterangan']}} </strong>
-													</td>
-												</tr>
-												@endforeach
-												@else
-												<tr>
-													<td>-</td>
-													<td>Tidak ada data rekam medis</td>
-												</tr>
-												@endif
-											</tbody>
-										</tr>
-									</table>
-								</div>
-								<div class="modal-footer">
-									<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-								</div>
-							</div>
-						</div>
+		<div class="modal fade" id="modal-riwayat">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title">Riwayat Rekam Medis</h4>
 					</div>
-
+					<div class="modal-body">
+						<table class="table table-striped table-bordered">
+							<tr>
+								<thead>
+									<tr>
+										<th width="15%">Tanggal Periksa</th>
+										<th>Hasil Rekam Medis</th>
+									</tr>
+								</thead>
+								<tbody>
+									@if($rekamMedis)
+									@foreach($rekamMedis as $data)
+									<tr>
+										<td>{{ date('d-m-Y', strtotime($data['created_at'])) }}</td>
+										<td>
+											Keluhan: <strong>{{$data['keluhan']}} </strong>|
+											Anamnesis: <strong>{{$data['anamnesis']}} </strong>|
+											Diagnosa: <strong>{{$data['diagnosa']}} </strong>|
+											Tindakan: <strong>{{$data['tindakan']}} </strong>|
+											Keterangan: <strong>{{$data['keterangan']}} </strong>
+										</td>
+									</tr>
+									@endforeach
+									@else
+									<tr>
+										<td>-</td>
+										<td>Tidak ada data rekam medis</td>
+									</tr>
+									@endif
+								</tbody>
+							</tr>
+						</table>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
 		<div class="x_panel">
 			<div class="x_title">
 				<h2>Rekam Medis Pasien <span class="badge" style="background: #1e88e5;color: #ffffff">{{ $pasien['id'] }}</span></h2>
@@ -273,66 +271,66 @@
 				$('#daftar-obat').append(obat);
 				$.each(data, function(i, item){
 					$('.obat').append($("<option/>", {
-								value: item.id,
-								text: item.nama
-								}));
+									value: item.id,
+									text: item.nama
+									}));
+							});
+							$('.select2').select2();
+						}
 						});
-						$('.select2').select2();
-					}
 					});
-
-				});
-				$('#frm-rekam-medis').on('submit', function(e) {
-					e.preventDefault();
-					var id = $('#rk_medis').val();
-					var biaya_dokter = $('#biaya_dokter').val();
-					var nama = $('#nama').val();
-					var tgl = $('#tgl_lahir').val();
-					var dokter_id = $('#dokter_id').val();
-					var pasien_id = $('#pasien_id').val();
-					var bb = $('#bb').val();
-					var tensi = $('#tensi').val();
-					var tb = $('#tb').val();
-					var bw = $('input[name="bw"]').val();
-					var keluhan = $('#keluhan').val();
-					var anamnesis = $('#anamnesis').val();
-					var diagnosa = $('#diagnosa').val();
-					var tindakan = $('#tindakan').val();
-					var deskripsi = $('#deskripsi').val();
-					if ($('#tidak').val()) {
-						var alergi = $('#tidak').val();
-					}else {
-						var alergi = $('#alergi_obat').val();
-					}
-					var obat = $('select[name="obat[]"]').serializeArray();
-					var jumlah = $('input[name="jumlah[]"]').serializeArray();
-					var keterangan = $('input[name="keterangan[]"]').serializeArray();
-					$.post("{{route('postRekamMedisPasien')}}", {
-						id:id,
-						biaya_dokter:biaya_dokter,
-						nama:nama,
-						tgl:tgl,
-						dokter_id:dokter_id,
-						pasien_id:pasien_id,
-						bb:bb,
-						tensi:tensi,
-						bw:bw,
-						tb:tb,
-						keluhan:keluhan,
-						anamnesis:anamnesis,
-						diagnosa:diagnosa,
-						tindakan:tindakan,
-						deskripsi:deskripsi,
-						alergi_obat:alergi,
-						obat:obat,
-						jumlah:jumlah,
-						keterangan:keterangan,
-					}, function(data) {
-						// console.log(data);
-						toastr.success('Success !', 'Data berhasil di simpan !');
-						location.href = "{{route('dokter.index')}}";
+					$('#frm-rekam-medis').on('submit', function(e) {
+						e.preventDefault();
+						var id = $('#rk_medis').val();
+						var biaya_dokter = $('#biaya_dokter').val();
+						var nama = $('#nama').val();
+						var tgl = $('#tgl_lahir').val();
+						var dokter_id = $('#dokter_id').val();
+						var pasien_id = $('#pasien_id').val();
+						var bb = $('#bb').val();
+						var tensi = $('#tensi').val();
+						var tb = $('#tb').val();
+						var bw = $('input[name="bw"]').val();
+						var keluhan = $('#keluhan').val();
+						var anamnesis = $('#anamnesis').val();
+						var diagnosa = $('#diagnosa').val();
+						var tindakan = $('#tindakan').val();
+						var deskripsi = $('#deskripsi').val();
+						if ($('#tidak').val()) {
+							var alergi = $('#tidak').val();
+						}else {
+							var alergi = $('#alergi_obat').val();
+						}
+						var obat = $('select[name="obat[]"]').serializeArray();
+						var jumlah = $('input[name="jumlah[]"]').serializeArray();
+						var keterangan = $('input[name="keterangan[]"]').serializeArray();
+						var data = {
+							id:id,
+							biaya_dokter:biaya_dokter,
+							nama:nama,
+							tgl:tgl,
+							dokter_id:dokter_id,
+							pasien_id:pasien_id,
+							bb:bb,
+							tensi:tensi,
+							bw:bw,
+							tb:tb,
+							keluhan:keluhan,
+							anamnesis:anamnesis,
+							diagnosa:diagnosa,
+							tindakan:tindakan,
+							deskripsi:deskripsi,
+							alergi_obat:alergi,
+							obat:obat,
+							jumlah:jumlah,
+							keterangan:keterangan
+						}
+						$.post("{{route('postRekamMedisPasien')}}", data, function(data) {
+							// console.log(data);
+							toastr.success('Success !', 'Data berhasil di simpan !');
+							location.href = "{{route('dokter.index')}}";
+						});
 					});
 				});
-			});
 	</script>
 	@endsection

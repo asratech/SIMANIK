@@ -28,7 +28,7 @@ Route::group(['prefix' => 'admin'], function() {
 // Respsionist
 Route::group(['prefix' => 'resepsionist'], function() {
 	Route::get('/', ['uses' => 'ResepsionistController@index', 'as' => 'resepsionist.index']);
-	Route::get('/no-antrian-pasien', ['uses' => 'ResepsionistController@no_antrian', 'as' => 'resepsionist.no_antrian']);
+	Route::get('/no-antrian-pasien/pasien_id={id}', ['uses' => 'ResepsionistController@no_antrian', 'as' => 'resepsionist.no_antrian']);
 	Route::get('/reset-no-antrian-pasien', ['uses' => 'ResepsionistController@resetNoAntrian', 'as' => 'resepsionist.reset_no_antrian']);
 	Route::post('/pendaftaran-pasien', ['uses' => 'ResepsionistController@postPendaftaranPasien', 'as' => 'postPendaftaranPasien']);
 	Route::get('/pasien/hapus', ['uses' => 'ResepsionistController@getHapusPasien', 'as' => 'getHapusPasien']);

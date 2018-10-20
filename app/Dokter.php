@@ -14,16 +14,15 @@ class Dokter extends Authenticatable
    public $incrementing = false;
    protected $table = 'dokters';
    protected $fillable = [
-         'id',
+      'id',
    	'username',
    	'password',
    	'nama',
    	'alamat',
    	'tgl_lahir',
    	'spesialis_id',
-          'level',
-          'photo'
-
+      'level',
+      'photo'
    ];
 
    public function spesialis() {
@@ -34,5 +33,5 @@ class Dokter extends Authenticatable
       return $this->photo;
    }
 
-   
+
 }
