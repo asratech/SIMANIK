@@ -178,7 +178,9 @@ class ApotekerController extends Controller
 
     public function getPrintTagihan($tagihan_id, $dokter_id, $pasien_id) {
         $size = array(0,0,204,650);
-        $resep = Resep::with(['obat', 'dokter', 'pasien'])->where(['dokter_id' => $dokter_id, 'pasien_id' => $pasien_id])->get()->toArray();
+        $resep = Resep::with(['obat', 'dokter', 'pasien'])->whereHas('obat', function($query) {
+            $query->where('status', 'ada');
+        })->where(['dokter_id' => $dokter_id, 'pasien_id' => $pasien_id])->get()->toArray();
         $tagihan = TransaksiPasien::where('id', $tagihan_id)->first();
         $pdf = PDF::loadView('apoteker.print', ['resep' => $resep, 'tagihan' => $tagihan])->setOptions(['dpi' => 72,'defaultFont' => 'sans-serif']);
         return $pdf->stream('Tagihan Klinik.pdf');

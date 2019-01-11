@@ -171,9 +171,9 @@
             $("#nomor").empty();
             $("#nomor").text(no+1)
             $("#id_antri").val(data.success.id)
-            $("#totalPasien").text(data.success.pasien_hari_ini)
-            $("#pasienBulanIni").text(data.success.total_pasien)
-            $("#pasienHariIni").text(data.success.total_per_bulan)
+            $("#totalPasien").text(data.success.total_pasien)
+            $("#pasienBulanIni").text(data.success.total_per_bulan)
+            $("#pasienHariIni").text(data.success.pasien_hari_ini)
             toastr.success('Success !', 'Data berhasil di simpan !');
             window.open("/resepsionist/no-antrian-pasien/pasien_id="+data.success.data.id, "_newtab")
         }).fail(function(xhr, status, error) {

@@ -57,7 +57,7 @@ class ResepsionistController extends Controller
 
                 $pasien = Pasien::whereDate('created_at', '=', date('Y-m-d'))->where('status', '=', 'antri')->get();
                 $total = Pasien::where('status', 'selesai')->get()->toArray();
-                $bulan = Pasien::whereMonth('created_at', '=', date('m'))->whereYear('created_at', '=', date('Y'))->get()->toArray();
+                $bulan = Pasien::where('status', 'selesai')->whereMonth('created_at', '=', date('m'))->whereYear('created_at', '=', date('Y'))->get()->toArray();
 
                 // create no antrian
                 $id = NoAntrian::select('id')->get()->last();
@@ -135,6 +135,7 @@ class ResepsionistController extends Controller
     public function getHapusPasien(Request $request) {
         if ($request->ajax()) {
             $data = Pasien::find($request->id)->delete();
+            $deleteNoAntrian = NoAntrian::where('pasien_id', $request->id)->delete();
             return response()->json($data);
         }
     }
